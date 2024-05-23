@@ -23,4 +23,4 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 # Mobile
 
-![image](./public/3.jpg)
+![image](./public/3.png)
