@@ -12,6 +12,7 @@ import {
   TableProps,
   Table,
   Tag,
+  Popconfirm,
 } from "antd";
 import Input from "antd/es/input/Input";
 import { DataType } from "./interfaces/datatype";
@@ -69,9 +70,14 @@ export default function Home() {
     {
       title: "Status",
       key: "status",
-      render: (_, { status }) => (
+      render: (object, { status }) => (
         <>
-          <Tag color={status == "DONE" ? "success" : "error"} key={status}>
+          <Tag
+            style={{ cursor: "pointer" }}
+            onClick={() => handleChangeStatus([object?.key], object?.status)}
+            color={status == "DONE" ? "success" : "error"}
+            key={status}
+          >
             {status.toUpperCase()}
           </Tag>
         </>
@@ -90,14 +96,14 @@ export default function Home() {
           >
             Edit
           </Button>
-          <Button
-            size={"middle"}
-            type="dashed"
-            danger
-            onClick={() => handleDelete([object.key])}
+          <Popconfirm
+            title="Sure to delete?"
+            onConfirm={() => handleDelete([object.key])}
           >
-            Delete
-          </Button>
+            <Button size={"middle"} type="dashed" danger>
+              Delete
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },
@@ -106,13 +112,13 @@ export default function Home() {
   const handleAddTodo = () => {
     if (input?.name?.trim() !== "") {
       setTodoList([
-        ...todoList,
         {
           key: uuid(),
           name: input?.name,
           description: input?.description,
           status: "PENDING",
         },
+        ...todoList,
       ]);
       setInput({ key: "", name: "", description: "", status: "PENDING" });
     }
@@ -144,6 +150,19 @@ export default function Home() {
         )
       );
     setSelected([]);
+  };
+
+  const handleChangeStatus = (
+    keys: Array<React.Key>,
+    status?: DataType["status"]
+  ) => {
+    setTodoList((prevTodoList) =>
+      prevTodoList.map((todo) =>
+        keys.includes(todo.key)
+          ? { ...todo, status: status == "PENDING" ? "DONE" : "PENDING" }
+          : todo
+      )
+    );
   };
 
   return (
@@ -206,7 +225,7 @@ export default function Home() {
             scroll={{ x: true }}
             columns={columns}
             rowSelection={{ ...rowSelection }}
-            dataSource={todoList.reverse()}
+            dataSource={todoList}
           />
         </Space>
       </div>
